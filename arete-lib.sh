@@ -1,13 +1,27 @@
 #!/bin/bash
-#------------------------------------------------------------
-# The *crude* beginnings of what might become a BASH
-# multi-host command executor, similar to Fabric in Python.
-#------------------------------------------------------------
+#-----------------------------------------------------------------
+# A BASH multi-host command executor, similar to Fabric in Python.
+#-----------------------------------------------------------------
 
 # scp wrapper for arete
 function arete_put
 {
-    echo ''
+    local local_file="$1"
+    local remote_path="$2"
+
+    # Loop over the commands running them on the target boxes
+    for host in "${ARETE_HOSTS[@]}"; do
+        if [ $ARETE_ASYNC -eq 1 ]; then
+            ( scp "$local_file" "$host":"$remote_path") &
+        else
+            scp "$local_file" "$host":"$remote_path"
+        fi
+    done
+
+    # Wait for the background jobs in async mode
+    if [ $ARETE_ASYNC -eq 1 ]; then
+        wait
+    fi
 }
 
 # Async mode, spit out the hostname from each box
@@ -19,9 +33,9 @@ function arete_run
     # Loop over the commands running them on the target boxes
     for host in "${ARETE_HOSTS[@]}"; do
         if [ $ARETE_ASYNC -eq 1 ]; then
-            ( ssh nathan@"$host"  "bash -c '$command'") &
+            ( ssh -tt "$host"  "bash -c '$command'") &
         else
-            ssh nathan@"$host" "bash -c '$command'"
+            ssh -tt "$host" "bash -c '$command'"
         fi
     done
 
