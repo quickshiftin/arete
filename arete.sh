@@ -55,8 +55,8 @@ while getopts "ah" OPTION; do
 done
 
 # Bail if functions file is not a regular file
-if [ ! -f "$1" ]; then
-    echo "$1" is not a regular file.
+if [ ! -z "$1" -a ! -f "$1" ]; then
+    echo Arete file "$1" is not a regular file.
     _usage
     exit 1
 fi
