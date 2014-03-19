@@ -157,6 +157,7 @@ function arete_ensure_host_known
 # prompting when logging into a host for the first time.
 #
 # @param $1 raw_host - <user>@<host> formatted string
+# @param $2 type     - The type of service on the ssh host
 #--------------------------------------------------------------------------------------
 function _arete_ensure_host_known
 {
@@ -174,7 +175,7 @@ function _arete_ensure_host_known
     # Only run ssh if there is no entry
     # @note Hit to network
     if [ $occurances -eq 0 ]; then
-        case "$raw_host" in
+        case "$2" in
             gitolite)
             success=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no \
                       "$raw_host" help >/dev/null 2>&1 && echo up || echo down)
