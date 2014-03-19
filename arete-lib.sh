@@ -149,30 +149,14 @@ function arete_ensure_host_known
     return 1
 }
 
-#-----------------------------------
-# Given a string like <user>@<host>,
-# split the components into an array
-#-----------------------------------
-function _arete_split_host
-{
-    local host_info=(${1//@/ })
-
-    # @note $user & $_host are expected to be locally
-    #       defined by the calling function
-    _user=${host_info[0]}
-    _host=${host_info[1]}
-}
-
 #--------------------------------------------------------------------------------------
+# TODO Get rid of the exits in this function ...
+#
 # Ensure there is an entry in known hosts file for given host
 # and user. What this does is prevent further commands from
 # prompting when logging into a host for the first time.
 #
-# @note $target defaults to true, b/c the function was originally written for github
-#
-# @param $1 ssh_user - The remote user to login as
-# @param $2 ssh_host - The remote host to login to
-# @param $3 target - Is the remote host a github box; optional, default is 0
+# @param $1 raw_host - <user>@<host> formatted string
 #--------------------------------------------------------------------------------------
 function _arete_ensure_host_known
 {
@@ -190,7 +174,7 @@ function _arete_ensure_host_known
     # Only run ssh if there is no entry
     # @note Hit to network
     if [ $occurances -eq 0 ]; then
-        case "$target" in
+        case "$raw_host" in
             gitolite)
             success=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no \
                       "$raw_host" help >/dev/null 2>&1 && echo up || echo down)
@@ -231,4 +215,18 @@ function _arete_ensure_host_known
     else
         return 6
     fi
+}
+
+#-----------------------------------
+# Given a string like <user>@<host>,
+# split the components into an array
+#-----------------------------------
+function _arete_split_host
+{
+    local host_info=(${1//@/ })
+
+    # @note $user & $_host are expected to be locally
+    #       defined by the calling function
+    _user=${host_info[0]}
+    _host=${host_info[1]}
 }
