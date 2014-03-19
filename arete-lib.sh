@@ -129,8 +129,8 @@ function arete
 #------------------------------------------------------------
 function arete_ensure_host_known
 {
-    local arete_host=$1
-    if [ -z "$arete_hsot" ]; then
+    local arete_host="$1"
+    if [ -z "$arete_host" ]; then
         cli-msg error 'No arete host specified'
         exit 1
     fi
