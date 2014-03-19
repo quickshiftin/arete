@@ -142,7 +142,6 @@ function arete_ensure_host_known
 
         # If the command succeeded so have we
         if [ $? -eq 0 ]; then
-            echo '<< Bailing from arete_ensure_host_known'
             return 0
         fi
     done
