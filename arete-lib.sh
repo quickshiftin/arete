@@ -142,6 +142,7 @@ function arete_ensure_host_known
 
         # If the command succeeded so have we
         if [ $? -eq 0 ]; then
+            echo '<< Bailing from arete_ensure_host_known'
             return 0
         fi
     done
@@ -164,56 +165,58 @@ function _arete_ensure_host_known
     local _host=
 
     # Extract the hostname from the raw host so we can search the know_hosts file
-    _arete_split_host
-
-    # Look for the host in the hosts files first
-    # @note Hit to disk
-    occurances=$(grep "$_host" ~/.ssh/known_hosts | wc -l)
+    _arete_split_host "$raw_host"
 
     # Only run ssh if there is no entry
     # @note Hit to network
-    if [ $occurances -eq 0 ]; then
-        case "$2" in
-            gitolite)
-            success=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no \
-                      "$raw_host" help >/dev/null 2>&1 && echo up || echo down)
-            if [ $success == 'down' ]; then
-                return 3
-            fi
-            ;;
+    case "$2" in
+        gitolite)
+        success=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no \
+                  "$raw_host" help >/dev/null 2>&1 && echo up || echo down)
+        if [ $success == 'down' -a $(_arete_host_known "$_host") -eq 0 ]; then
+            return 3
+        fi
+        ;;
 
-            github)
-            # There's a semi-abnormal approach to handle github, since they don't let you
-            # actually log in
-            success=$(ssh -o StrictHostKeyChecking=no -T "$raw_host")
-            if [[ "$success" != *'successfully authenticated'* ]]; then
-                return 4
-            fi
-            ;;
+        github)
+        # There's a semi-abnormal approach to handle github, since they don't let you
+        # actually log in
+        success=$(ssh -o StrictHostKeyChecking=no -T "$raw_host")
+        if [[ "$success" != *'successfully authenticated'* ]] && \
+           [ -a $(_arete_host_known "$_host") -eq 0 ]; then
+            return 4
+        fi
+        ;;
 
-            ssh)
-            # On regular boxes though, we'll log in and run the cd builtin
-            success=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no \
-                      "$raw_host" cd && echo up || echo down)
-            if [ $success == 'down' ]; then
-                return 5
-            fi
-            ;;
+        ssh)
+        # On regular boxes though, we'll log in and run the cd builtin
+        success=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no \
+                  "$raw_host" cd && echo up || echo down)
 
-            *)
-            return 255
-            ;;
-        esac
-    fi
+        # If our command ran successfully on the remote box or the entry appeared
+        # in the known_hosts file anyway
+        if [ "$success" == 'down' -a $(_arete_host_known "$_host") -eq 0 ]; then
+            return 5
+        fi
+        ;;
 
-    # Let's check up on ourselves, if the above command worked
-    # there should be an entry in the known_hosts now
-    occurances=$(grep "$ssh_host" ~/.ssh/known_hosts | wc -l)
-    if [ "$occurances" -gt 0 ]; then
-        return 0
-    else
-        return 6
-    fi
+        *)
+        return 255
+        ;;
+    esac
+}
+
+#-----------------------------------
+# Check the ~/.ssh/known_hosts file
+# for a given host.
+#-----------------------------------
+function _arete_host_known
+{
+    # Look for the host in the hosts files first
+    # @note Hit to disk
+    local occurances=$(grep "^$_host" ~/.ssh/known_hosts | wc -l)
+
+    return test "$occurances" -gt 0
 }
 
 #-----------------------------------
