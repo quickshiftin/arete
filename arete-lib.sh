@@ -92,8 +92,8 @@ function arete_hosts
 
         # Iterate over array items, appending them individually
         a="${!arg}"
-        is_array=$(declare -p a 2> /dev/null | grep -q '^declare \-a')
-        if [ "$is_array" -eq 0 ]; then
+        $(declare -p a 2> /dev/null | grep -q '^declare \-a')
+        if [ "$?" -eq 0 ]; then
             for inner_arg in "${a[@]}"; do
                 arete_append_host $a["$inner_arg"]
             done
