@@ -2,4 +2,8 @@
 
 sudo cp arete-lib.sh /usr/share
 sudo cp arete.sh /usr/share
+
+if [ -e /usr/sbin/arete ]; then
+    rm /usr/sbin/arete
+fi
 sudo ln -nf /usr/share/arete.sh /usr/sbin/arete
