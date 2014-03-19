@@ -2,7 +2,14 @@
 
 # Load the arete library
 # @note May package this in a single file ...
-source ./arete-lib.sh
+if [ -f ./arete-lib.sh ]; then
+    source ./arete-lib.sh
+elif [ -f /usr/share/arete-lib.sh ]; then
+    source /usr/share/arete-lib.sh
+else
+    echo 'Failed to load library file.'
+    exit 1
+fi
 
 function _usage
 {
