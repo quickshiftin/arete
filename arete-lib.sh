@@ -150,8 +150,6 @@ function arete_ensure_host_known
 }
 
 #--------------------------------------------------------------------------------------
-# TODO Get rid of the exits in this function ...
-#
 # Ensure there is an entry in known hosts file for given host
 # and user. What this does is prevent further commands from
 # prompting when logging into a host for the first time.
@@ -180,7 +178,7 @@ function _arete_ensure_host_known
             success=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no \
                       "$raw_host" help >/dev/null 2>&1 && echo up || echo down)
             if [ $success == 'down' ]; then
-                exit 3
+                return 3
             fi
             ;;
 
@@ -189,7 +187,7 @@ function _arete_ensure_host_known
             # actually log in
             success=$(ssh -o StrictHostKeyChecking=no -T "$raw_host")
             if [[ "$success" != *'successfully authenticated'* ]]; then
-                exit 4
+                return 4
             fi
             ;;
 
@@ -198,12 +196,12 @@ function _arete_ensure_host_known
             success=$(ssh -q -o BatchMode=yes -o StrictHostKeyChecking=no \
                       "$raw_host" cd && echo up || echo down)
             if [ $success == 'down' ]; then
-                exit 5
+                return 5
             fi
             ;;
 
             *)
-            exit 255
+            return 255
             ;;
         esac
     fi
