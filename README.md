@@ -135,6 +135,10 @@ function task_test_put
 
 Coming Soon.
 
+**Exportig BASH functions**
+
+Coming Soon.
+
 arete API
 -----------
 **arete globals**
