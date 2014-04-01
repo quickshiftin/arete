@@ -4,8 +4,8 @@
 # @note May package this in a single file ...
 if [ -f ./arete-lib.sh ]; then
     source ./arete-lib.sh
-elif [ -f /usr/share/arete-lib.sh ]; then
-    source /usr/share/arete-lib.sh
+elif [ -f /usr/lib/arete-lib.sh ]; then
+    source /usr/lib/arete-lib.sh
 else
     echo 'Failed to load library file.'
     exit 1

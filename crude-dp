@@ -1,5 +1,8 @@
 #!/bin/bash
 
-sudo cp arete-lib.sh /usr/share
-sudo cp arete.sh /usr/share
-sudo ln -nf /usr/share/arete.sh /usr/sbin/arete
+sudo rm /usr/share/arete-lib.sh 2>/dev/null
+sudo rm /usr/share/arete.sh 2>/dev/null
+sudo unlink /usr/sbin/arete 2>/dev/null
+
+sudo cp arete-lib.sh arete.sh /usr/lib
+sudo ln -nf /usr/lib/arete.sh /usr/sbin/arete
