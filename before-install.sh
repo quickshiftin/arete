@@ -8,6 +8,6 @@ if [ -f /usr/share/arete.sh ]; then
     sudo rm /usr/share/arete.sh 2>/dev/null
 fi
 
-if -f [ /usr/sbin/arete ]; then
+if [ -f /usr/sbin/arete ]; then
     sudo unlink /usr/sbin/arete 2>/dev/null
 fi
